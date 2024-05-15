@@ -68,7 +68,7 @@ const Zendel = () => {
         flexDirection: "column",
       }}
     >
-      <h1>Simple Iteration</h1>
+      <h1>Зейделя</h1>
 
       <input
         type="number"
@@ -167,6 +167,18 @@ const Zendel = () => {
                 </div>
                 {getDeterminant(matrix)}
               </div>
+              <div>
+                <p>
+                  &lambda; ={" "}
+                  {solveCubic(matrix).map((el, index) => (
+                    <span key={index}>
+                      {el}
+                      {index < solveCubic(matrix).length - 1 ? ", " : ""}
+                    </span>
+                  ))}
+                </p>
+              </div>
+
               <p>якщо всі &lambda; менше одиниці то метод збіжний</p>
             </>
           ) : null}
@@ -251,7 +263,7 @@ function zendel(A, b, initialGuess, tolerance, maxIterations) {
             }}
           >
             <p>
-              x<sub>{index}</sub>
+              x<sub>{index + 1}</sub>
               <sup>(k)</sup>
             </p>
             = ({el}
@@ -307,7 +319,7 @@ function zendel(A, b, initialGuess, tolerance, maxIterations) {
               }}
             >
               <p>
-                x<sub>{index}</sub>
+                x<sub>{index + 1}</sub>
                 <sup>({iteration + 1})</sup>
               </p>
               = ({el}
@@ -388,11 +400,20 @@ function zendel(A, b, initialGuess, tolerance, maxIterations) {
 // console.log("Розв'язок:", solution);
 
 const getDeterminant = (matrix) => {
+  const a = matrix[0][0] * matrix[1][1] * matrix[2][2];
+  const b = 0;
+  const c =
+    -(matrix[0][2] * matrix[1][1] * matrix[2][0]) -
+    matrix[1][0] * matrix[0][1] * matrix[2][2] -
+    matrix[0][0] * matrix[2][1] * matrix[1][2];
+  const d =
+    matrix[0][1] * matrix[1][2] * matrix[2][0] +
+    matrix[1][0] * matrix[2][1] * matrix[0][2];
   return (
     <>
       <p>
         = {matrix[0][0]}&lambda;*{matrix[1][1]}&lambda;*{matrix[2][2]}&lambda; +{" "}
-        {matrix[0][1]}*{matrix[2][0]}*{matrix[1][2]}+ {matrix[1][0]}*
+        {matrix[0][1]}*{matrix[2][0]}*{matrix[1][2]} + {matrix[1][0]}*
         {matrix[2][1]}*{matrix[0][2]}-{matrix[0][2]}*{matrix[1][1]}&lambda;*
         {matrix[2][0]}- {matrix[1][0]}*{matrix[0][1]}* {matrix[2][2]}&lambda; -{" "}
         {matrix[0][0]}&lambda;*
@@ -401,3 +422,74 @@ const getDeterminant = (matrix) => {
     </>
   );
 };
+
+function solveCubic(matrix) {
+  let a = matrix[0][0] * matrix[1][1] * matrix[2][2];
+  let b = 0;
+  let c =
+    -(matrix[0][2] * matrix[1][1] * matrix[2][0]) -
+    matrix[1][0] * matrix[0][1] * matrix[2][2] -
+    matrix[0][0] * matrix[2][1] * matrix[1][2];
+  let d =
+    matrix[0][1] * matrix[1][2] * matrix[2][0] +
+    matrix[1][0] * matrix[2][1] * matrix[0][2];
+  console.log("a", a);
+  console.log("b", b);
+  console.log("c", c);
+  console.log("d", d);
+  if (a === 0) {
+    throw new Error(
+      "Коефіцієнт a не може бути нульовим для кубічного рівняння"
+    );
+  }
+
+  // Нормалізація коефіцієнтів
+  b /= a;
+  c /= a;
+  d /= a;
+
+  // Знаходження дискримінанта
+  const delta0 = b * b - 3 * c;
+  const delta1 = 2 * b * b * b - 9 * b * c + 27 * d;
+  const discriminant = (delta1 * delta1 - 4 * delta0 * delta0 * delta0) / 27;
+
+  let roots = [];
+
+  if (discriminant > 0) {
+    // Один дійсний корінь і два комплексних кореня
+    let C = Math.cbrt(
+      (delta1 + Math.sqrt(delta1 * delta1 - 4 * delta0 * delta0 * delta0)) / 2
+    );
+    if (C === 0) {
+      C = Math.cbrt(
+        (delta1 - Math.sqrt(delta1 * delta1 - 4 * delta0 * delta0 * delta0)) / 2
+      );
+    }
+    const u = [1, (-1 + Math.sqrt(-3)) / 2, (-1 - Math.sqrt(-3)) / 2];
+    for (let k = 0; k < 3; k++) {
+      const root = (-1 / 3) * (b + u[k] * C + delta0 / (u[k] * C));
+      roots.push(root);
+    }
+  } else if (discriminant === 0) {
+    // Всі корені дійсні і принаймні два однакові
+    if (delta0 === 0) {
+      const root = -b / 3;
+      roots.push(root);
+    } else {
+      const root1 = -b / 3 + delta1 / (3 * delta0);
+      const root2 = -b / 3 - delta1 / (6 * delta0);
+      roots.push(root1, root2, root2);
+    }
+  } else {
+    // Всі три корені дійсні і різні
+    const theta = Math.acos(delta1 / (2 * Math.sqrt(delta0 * delta0 * delta0)));
+    for (let k = 0; k < 3; k++) {
+      const root =
+        -2 * Math.sqrt(delta0 / 3) * Math.cos((theta + 2 * Math.PI * k) / 3) -
+        b / 3;
+      roots.push(root);
+    }
+  }
+
+  return roots;
+}

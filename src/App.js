@@ -45,7 +45,7 @@ function App() {
         checked={selectedOption === 2}
         onChange={() => handleOptionChange(2)}
       />
-      <label>Option 2</label>
+      <label>UTU</label>
 
       <input
         type="radio"
@@ -53,7 +53,7 @@ function App() {
         checked={selectedOption === 3}
         onChange={() => handleOptionChange(3)}
       />
-      <label>Option 3</label>
+      <label>метод гауса</label>
 
       <input
         type="radio"
@@ -61,7 +61,7 @@ function App() {
         checked={selectedOption === 4}
         onChange={() => handleOptionChange(4)}
       />
-      <label>Option 4</label>
+      <label>LU</label>
       <input
         type="radio"
         value={4}
